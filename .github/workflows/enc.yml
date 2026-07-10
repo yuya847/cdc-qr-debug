@@ -1,0 +1,10 @@
+name: enc
+on: [push, workflow_dispatch]
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add-Type encoder test (Windows PowerShell 5.1)
+        shell: powershell
+        run: .\test-encoder.ps1
