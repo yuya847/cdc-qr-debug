@@ -1555,7 +1555,7 @@ namespace QRCoder
     public class QRCodeData
     {
         public List<BitArray> ModuleMatrix { get; set; }
-        public readonly int Version;
+        public int Version { get; private set; }
         public QRCodeData(int version)
         {
             this.Version = version;
