@@ -1414,13 +1414,13 @@ namespace QRCoder
                 this.ECCWordsInt = eccWordsInt;
             }
 
-            public int GroupNumber { get; }
-            public int BlockNumber { get; }
-            public string BitString { get; }
-            public List<string> CodeWords { get; }
-            public List<int> CodeWordsInt { get; }
-            public List<string> ECCWords { get; }
-            public List<int> ECCWordsInt { get; }
+            public int GroupNumber { get; private set; }
+            public int BlockNumber { get; private set; }
+            public string BitString { get; private set; }
+            public List<string> CodeWords { get; private set; }
+            public List<int> CodeWordsInt { get; private set; }
+            public List<string> ECCWords { get; private set; }
+            public List<int> ECCWordsInt { get; private set; }
         }
 
         private struct ECCInfo
@@ -1437,14 +1437,14 @@ namespace QRCoder
                 this.BlocksInGroup2 = blocksInGroup2;
                 this.CodewordsInGroup2 = codewordsInGroup2;
             }
-            public int Version { get; }
-            public ECCLevel ErrorCorrectionLevel { get; }
-            public int TotalDataCodewords { get; }
-            public int ECCPerBlock { get; }
-            public int BlocksInGroup1 { get; }
-            public int CodewordsInGroup1 { get; }
-            public int BlocksInGroup2 { get; }
-            public int CodewordsInGroup2 { get; }
+            public int Version { get; private set; }
+            public ECCLevel ErrorCorrectionLevel { get; private set; }
+            public int TotalDataCodewords { get; private set; }
+            public int ECCPerBlock { get; private set; }
+            public int BlocksInGroup1 { get; private set; }
+            public int CodewordsInGroup1 { get; private set; }
+            public int BlocksInGroup2 { get; private set; }
+            public int CodewordsInGroup2 { get; private set; }
         }
 
         private struct VersionInfo
@@ -1454,8 +1454,8 @@ namespace QRCoder
                 this.Version = version;
                 this.Details = versionInfoDetails;
             }
-            public int Version { get; }
-            public List<VersionInfoDetails> Details { get; }
+            public int Version { get; private set; }
+            public List<VersionInfoDetails> Details { get; private set; }
         }
 
         private struct VersionInfoDetails
@@ -1466,8 +1466,8 @@ namespace QRCoder
                 this.CapacityDict = capacityDict;
             }
 
-            public ECCLevel ErrorCorrectionLevel { get; }
-            public Dictionary<EncodingMode, int> CapacityDict { get; }
+            public ECCLevel ErrorCorrectionLevel { get; private set; }
+            public Dictionary<EncodingMode, int> CapacityDict { get; private set; }
         }
 
         private struct Antilog
@@ -1477,8 +1477,8 @@ namespace QRCoder
                 this.ExponentAlpha = exponentAlpha;
                 this.IntegerValue = integerValue;
             }
-            public int ExponentAlpha { get; }
-            public int IntegerValue { get; }
+            public int ExponentAlpha { get; private set; }
+            public int IntegerValue { get; private set; }
         }
 
         private struct PolynomItem
@@ -1489,8 +1489,8 @@ namespace QRCoder
                 this.Exponent = exponent;
             }
 
-            public int Coefficient { get; }
-            public int Exponent { get; }
+            public int Coefficient { get; private set; }
+            public int Exponent { get; private set; }
         }
 
         private class Polynom
@@ -1517,8 +1517,8 @@ namespace QRCoder
 
         private class Point
         {
-            public int X { get; }
-            public int Y { get; }
+            public int X { get; private set; }
+            public int Y { get; private set; }
             public Point(int x, int y)
             {
                 this.X = x;
@@ -1528,10 +1528,10 @@ namespace QRCoder
 
         private class Rectangle
         {
-            public int X { get; }
-            public int Y { get; }
-            public int Width { get; }
-            public int Height { get; }
+            public int X { get; private set; }
+            public int Y { get; private set; }
+            public int Width { get; private set; }
+            public int Height { get; private set; }
 
             public Rectangle(int x, int y, int w, int h)
             {
