@@ -1414,13 +1414,13 @@ namespace QRCoder
                 this.ECCWordsInt = eccWordsInt;
             }
 
-            public int GroupNumber { get; private set; }
-            public int BlockNumber { get; private set; }
-            public string BitString { get; private set; }
-            public List<string> CodeWords { get; private set; }
-            public List<int> CodeWordsInt { get; private set; }
-            public List<string> ECCWords { get; private set; }
-            public List<int> ECCWordsInt { get; private set; }
+            public readonly int GroupNumber;
+            public readonly int BlockNumber;
+            public readonly string BitString;
+            public readonly List<string> CodeWords;
+            public readonly List<int> CodeWordsInt;
+            public readonly List<string> ECCWords;
+            public readonly List<int> ECCWordsInt;
         }
 
         private struct ECCInfo
@@ -1437,14 +1437,14 @@ namespace QRCoder
                 this.BlocksInGroup2 = blocksInGroup2;
                 this.CodewordsInGroup2 = codewordsInGroup2;
             }
-            public int Version { get; private set; }
-            public ECCLevel ErrorCorrectionLevel { get; private set; }
-            public int TotalDataCodewords { get; private set; }
-            public int ECCPerBlock { get; private set; }
-            public int BlocksInGroup1 { get; private set; }
-            public int CodewordsInGroup1 { get; private set; }
-            public int BlocksInGroup2 { get; private set; }
-            public int CodewordsInGroup2 { get; private set; }
+            public readonly int Version;
+            public readonly ECCLevel ErrorCorrectionLevel;
+            public readonly int TotalDataCodewords;
+            public readonly int ECCPerBlock;
+            public readonly int BlocksInGroup1;
+            public readonly int CodewordsInGroup1;
+            public readonly int BlocksInGroup2;
+            public readonly int CodewordsInGroup2;
         }
 
         private struct VersionInfo
@@ -1454,8 +1454,8 @@ namespace QRCoder
                 this.Version = version;
                 this.Details = versionInfoDetails;
             }
-            public int Version { get; private set; }
-            public List<VersionInfoDetails> Details { get; private set; }
+            public readonly int Version;
+            public readonly List<VersionInfoDetails> Details;
         }
 
         private struct VersionInfoDetails
@@ -1466,8 +1466,8 @@ namespace QRCoder
                 this.CapacityDict = capacityDict;
             }
 
-            public ECCLevel ErrorCorrectionLevel { get; private set; }
-            public Dictionary<EncodingMode, int> CapacityDict { get; private set; }
+            public readonly ECCLevel ErrorCorrectionLevel;
+            public readonly Dictionary<EncodingMode, int> CapacityDict;
         }
 
         private struct Antilog
@@ -1477,8 +1477,8 @@ namespace QRCoder
                 this.ExponentAlpha = exponentAlpha;
                 this.IntegerValue = integerValue;
             }
-            public int ExponentAlpha { get; private set; }
-            public int IntegerValue { get; private set; }
+            public readonly int ExponentAlpha;
+            public readonly int IntegerValue;
         }
 
         private struct PolynomItem
@@ -1489,8 +1489,8 @@ namespace QRCoder
                 this.Exponent = exponent;
             }
 
-            public int Coefficient { get; private set; }
-            public int Exponent { get; private set; }
+            public readonly int Coefficient;
+            public readonly int Exponent;
         }
 
         private class Polynom
@@ -1517,8 +1517,8 @@ namespace QRCoder
 
         private class Point
         {
-            public int X { get; private set; }
-            public int Y { get; private set; }
+            public readonly int X;
+            public readonly int Y;
             public Point(int x, int y)
             {
                 this.X = x;
@@ -1528,10 +1528,10 @@ namespace QRCoder
 
         private class Rectangle
         {
-            public int X { get; private set; }
-            public int Y { get; private set; }
-            public int Width { get; private set; }
-            public int Height { get; private set; }
+            public readonly int X;
+            public readonly int Y;
+            public readonly int Width;
+            public readonly int Height;
 
             public Rectangle(int x, int y, int w, int h)
             {
@@ -1555,7 +1555,7 @@ namespace QRCoder
     public class QRCodeData
     {
         public List<BitArray> ModuleMatrix { get; set; }
-        public int Version { get; private set; }
+        public readonly int Version;
         public QRCodeData(int version)
         {
             this.Version = version;
