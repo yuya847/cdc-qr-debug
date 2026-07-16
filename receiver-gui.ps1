@@ -8,7 +8,7 @@ Add-Type -AssemblyName System.Drawing
 
 $form = New-Object System.Windows.Forms.Form
 $form.Text = 'CDC File Receiver'
-$form.Size = New-Object System.Drawing.Size(1080, 520)
+$form.Size = New-Object System.Drawing.Size(1080, 560)
 $form.StartPosition = 'CenterScreen'
 
 $script:recvStop = $false
@@ -1953,6 +1953,89 @@ $btnShowQR.Add_Click({
     Log ('QRエラー: ' + $_.Exception.Message)
   } finally {
     $btnShowQR.Enabled = $true
+  }
+})
+
+# ================= CDC送信（→スマホ・大容量） =================
+# 'r' 送信 -> [nameLen2][name][dataLen4][data][sum4] (firmware cdcRecvFromEmr と一致)
+$script:cdcSendPath = $null
+
+$grpCdc = New-Object System.Windows.Forms.GroupBox
+$grpCdc.Text = 'CDC送信（→スマホ・大容量）'; $grpCdc.Location = '12,244'; $grpCdc.Size = New-Object System.Drawing.Size(522, 150)
+$tabSend.Controls.Add($grpCdc)
+
+$lblCdcNote = New-Object System.Windows.Forms.Label
+$lblCdcNote.Text = '大容量ファイルをCDC経由でスマホへ。送信後スマホ192.168.4.1の「ダウンロード」欄に出る。'
+$lblCdcNote.Location = '12,20'; $lblCdcNote.Size = New-Object System.Drawing.Size(498, 34)
+$grpCdc.Controls.Add($lblCdcNote)
+
+$btnCdcPick = New-Object System.Windows.Forms.Button
+$btnCdcPick.Text = 'ファイル選択'; $btnCdcPick.Location = '12,58'; $btnCdcPick.Size = New-Object System.Drawing.Size(110, 30)
+$grpCdc.Controls.Add($btnCdcPick)
+
+$lblCdcFile = New-Object System.Windows.Forms.Label
+$lblCdcFile.Text = '(未選択)'; $lblCdcFile.Location = '132,64'; $lblCdcFile.Size = New-Object System.Drawing.Size(378, 20)
+$grpCdc.Controls.Add($lblCdcFile)
+
+$btnCdcSend = New-Object System.Windows.Forms.Button
+$btnCdcSend.Text = 'CDC送信'; $btnCdcSend.Location = '12,96'; $btnCdcSend.Size = New-Object System.Drawing.Size(110, 36)
+$grpCdc.Controls.Add($btnCdcSend)
+
+$lblCdcStatus = New-Object System.Windows.Forms.Label
+$lblCdcStatus.Text = '待機中'; $lblCdcStatus.Location = '132,104'; $lblCdcStatus.Size = New-Object System.Drawing.Size(378, 20)
+$grpCdc.Controls.Add($lblCdcStatus)
+
+$btnCdcPick.Add_Click({
+  $dlg = New-Object System.Windows.Forms.OpenFileDialog
+  try {
+    if ($dlg.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+      $script:cdcSendPath = $dlg.FileName
+      $lblCdcFile.Text = [System.IO.Path]::GetFileName($script:cdcSendPath)
+    }
+  } finally { $dlg.Dispose() }
+})
+
+$btnCdcSend.Add_Click({
+  if ([string]::IsNullOrEmpty($script:cdcSendPath) -or -not (Test-Path -LiteralPath $script:cdcSendPath)) { $lblCdcStatus.Text = 'ファイル未選択'; return }
+  if ($cmbPort.SelectedItem -eq $null) { $lblCdcStatus.Text = 'COMポートを受信タブで選択してください'; return }
+  $btnCdcSend.Enabled = $false
+  $sp = $null
+  try {
+    $data = [System.IO.File]::ReadAllBytes($script:cdcSendPath)
+    $name = [System.IO.Path]::GetFileName($script:cdcSendPath)
+    $nb = [System.Text.Encoding]::UTF8.GetBytes($name)
+    $sp = New-Object System.IO.Ports.SerialPort $cmbPort.SelectedItem,115200,'None',8,'One'
+    $sp.DtrEnable = $true; $sp.WriteTimeout = 20000; $sp.ReadTimeout = 15000
+    $sp.Open()
+    Start-Sleep -Milliseconds 300
+    $sp.Write('r')
+    $sp.Write([BitConverter]::GetBytes([uint16]$nb.Length), 0, 2)
+    $sp.Write($nb, 0, $nb.Length)
+    $sp.Write([BitConverter]::GetBytes([uint32]$data.Length), 0, 4)
+    $off = 0
+    while ($off -lt $data.Length) {
+      $c = [Math]::Min(4096, $data.Length - $off)
+      $sp.Write($data, $off, $c)
+      $off += $c
+      $lblCdcStatus.Text = "送信中 $off / $($data.Length)"
+      [System.Windows.Forms.Application]::DoEvents()
+    }
+    $sum = 0; foreach ($b in $data) { $sum = ($sum + $b) -band 0xFFFFFFFF }
+    $sp.Write([BitConverter]::GetBytes([uint32]$sum), 0, 4)
+    Start-Sleep -Milliseconds 300
+    $ack = ''; try { $ack = $sp.ReadLine() } catch { }
+    $sp.Close()
+    if ($ack -match 'OK') {
+      $lblCdcStatus.Text = '完了: スマホ192.168.4.1のダウンロード欄で保存'
+      Log ('CDC送信 完了: ' + $name + ' (' + $data.Length + 'B) ack=' + $ack)
+    } else {
+      $lblCdcStatus.Text = "NG ack=$ack"
+    }
+  } catch {
+    $lblCdcStatus.Text = 'エラー: ' + $_.Exception.Message
+  } finally {
+    if ($sp -ne $null -and $sp.IsOpen) { $sp.Close() }
+    $btnCdcSend.Enabled = $true
   }
 })
 
