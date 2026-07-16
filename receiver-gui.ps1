@@ -1961,7 +1961,7 @@ $btnShowQR.Add_Click({
 $script:cdcSendPath = $null
 
 $grpCdc = New-Object System.Windows.Forms.GroupBox
-$grpCdc.Text = 'CDC送信（→スマホ・大容量）'; $grpCdc.Location = '12,244'; $grpCdc.Size = New-Object System.Drawing.Size(522, 150)
+$grpCdc.Text = 'CDC送信（→スマホ・大容量）'; $grpCdc.Location = '12,244'; $grpCdc.Size = New-Object System.Drawing.Size(522, 215)
 $tabSend.Controls.Add($grpCdc)
 
 $lblCdcNote = New-Object System.Windows.Forms.Label
@@ -1984,6 +1984,29 @@ $grpCdc.Controls.Add($btnCdcSend)
 $lblCdcStatus = New-Object System.Windows.Forms.Label
 $lblCdcStatus.Text = '待機中'; $lblCdcStatus.Location = '132,104'; $lblCdcStatus.Size = New-Object System.Drawing.Size(378, 20)
 $grpCdc.Controls.Add($lblCdcStatus)
+
+$pnlCdcDrop = New-Object System.Windows.Forms.Panel
+$pnlCdcDrop.Location = '12,138'; $pnlCdcDrop.Size = New-Object System.Drawing.Size(498, 64); $pnlCdcDrop.BorderStyle = 'FixedSingle'; $pnlCdcDrop.AllowDrop = $true
+$grpCdc.Controls.Add($pnlCdcDrop)
+
+$lblCdcDrop = New-Object System.Windows.Forms.Label
+$lblCdcDrop.Text = 'またはここにファイルをドロップ'; $lblCdcDrop.Dock = 'Fill'; $lblCdcDrop.TextAlign = 'MiddleCenter'; $lblCdcDrop.AllowDrop = $true
+$pnlCdcDrop.Controls.Add($lblCdcDrop)
+
+$cdcDragEnter = {
+  if ($_.Data.GetDataPresent([System.Windows.Forms.DataFormats]::FileDrop)) { $_.Effect = [System.Windows.Forms.DragDropEffects]::Copy }
+  else { $_.Effect = [System.Windows.Forms.DragDropEffects]::None }
+}
+$cdcDragDrop = {
+  $files = $_.Data.GetData([System.Windows.Forms.DataFormats]::FileDrop)
+  if ($files -ne $null -and $files.Length -gt 0) {
+    $script:cdcSendPath = [string]$files[0]
+    $lblCdcFile.Text = [System.IO.Path]::GetFileName($script:cdcSendPath)
+    $lblCdcStatus.Text = '待機中'
+  }
+}
+$pnlCdcDrop.Add_DragEnter($cdcDragEnter); $pnlCdcDrop.Add_DragDrop($cdcDragDrop)
+$lblCdcDrop.Add_DragEnter($cdcDragEnter); $lblCdcDrop.Add_DragDrop($cdcDragDrop)
 
 $btnCdcPick.Add_Click({
   $dlg = New-Object System.Windows.Forms.OpenFileDialog
