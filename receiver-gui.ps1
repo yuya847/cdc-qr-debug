@@ -8,54 +8,68 @@ Add-Type -AssemblyName System.Drawing
 
 $form = New-Object System.Windows.Forms.Form
 $form.Text = 'CDC File Receiver'
-$form.Size = New-Object System.Drawing.Size(1060, 700)
+$form.Size = New-Object System.Drawing.Size(1080, 520)
 $form.StartPosition = 'CenterScreen'
 
 $script:recvStop = $false
 
+# ---- タブ構成 (受信 / 送信) ----
+$tabs = New-Object System.Windows.Forms.TabControl
+$tabs.Dock = 'Fill'
+
+$tabRecv = New-Object System.Windows.Forms.TabPage
+$tabRecv.Text = '受信'
+
+$tabSend = New-Object System.Windows.Forms.TabPage
+$tabSend.Text = '送信'
+
+$tabs.Controls.Add($tabRecv)
+$tabs.Controls.Add($tabSend)
+$form.Controls.Add($tabs)
+
 $lblPort = New-Object System.Windows.Forms.Label
 $lblPort.Text = 'COM:'; $lblPort.Location = '12,16'; $lblPort.AutoSize = $true
-$form.Controls.Add($lblPort)
+$tabRecv.Controls.Add($lblPort)
 
 $cmbPort = New-Object System.Windows.Forms.ComboBox
 $cmbPort.Location = '52,12'; $cmbPort.Width = 110; $cmbPort.DropDownStyle = 'DropDownList'
-$form.Controls.Add($cmbPort)
+$tabRecv.Controls.Add($cmbPort)
 
 $btnRefresh = New-Object System.Windows.Forms.Button
 $btnRefresh.Text = '更新'; $btnRefresh.Location = '170,10'; $btnRefresh.Width = 55
-$form.Controls.Add($btnRefresh)
+$tabRecv.Controls.Add($btnRefresh)
 
 $rbBuf = New-Object System.Windows.Forms.RadioButton
 $rbBuf.Text = 'バッファ受信(f)'; $rbBuf.Location = '240,4'; $rbBuf.AutoSize = $true
-$form.Controls.Add($rbBuf)
+$tabRecv.Controls.Add($rbBuf)
 
 $rbStream = New-Object System.Windows.Forms.RadioButton
 $rbStream.Text = 'ストリーミング受信'; $rbStream.Location = '240,26'; $rbStream.AutoSize = $true; $rbStream.Checked = $true
-$form.Controls.Add($rbStream)
+$tabRecv.Controls.Add($rbStream)
 
 $chkLoop = New-Object System.Windows.Forms.CheckBox
 $chkLoop.Text = '連続受信(複数)'; $chkLoop.Location = '400,15'; $chkLoop.AutoSize = $true
-$form.Controls.Add($chkLoop)
+$tabRecv.Controls.Add($chkLoop)
 
 $btnRecv = New-Object System.Windows.Forms.Button
 $btnRecv.Text = '受信開始'; $btnRecv.Location = '12,52'; $btnRecv.Width = 130; $btnRecv.Height = 40
-$form.Controls.Add($btnRecv)
+$tabRecv.Controls.Add($btnRecv)
 
 $btnStop = New-Object System.Windows.Forms.Button
 $btnStop.Text = '停止'; $btnStop.Location = '150,52'; $btnStop.Width = 80; $btnStop.Height = 40; $btnStop.Enabled = $false
-$form.Controls.Add($btnStop)
+$tabRecv.Controls.Add($btnStop)
 
 $pb = New-Object System.Windows.Forms.ProgressBar
 $pb.Location = '12,104'; $pb.Width = 522; $pb.Height = 22
-$form.Controls.Add($pb)
+$tabRecv.Controls.Add($pb)
 
 $lblStatus = New-Object System.Windows.Forms.Label
 $lblStatus.Text = '待機中'; $lblStatus.Location = '12,132'; $lblStatus.Width = 522; $lblStatus.AutoSize = $false
-$form.Controls.Add($lblStatus)
+$tabRecv.Controls.Add($lblStatus)
 
 $log = New-Object System.Windows.Forms.TextBox
 $log.Multiline = $true; $log.ScrollBars = 'Vertical'; $log.Location = '12,158'; $log.Width = 522; $log.Height = 220; $log.ReadOnly = $true
-$form.Controls.Add($log)
+$tabRecv.Controls.Add($log)
 
 function Log($m) { $log.AppendText($m + "`r`n") }
 
@@ -1777,8 +1791,8 @@ function Ensure-QREncoder {
 
 # ---- QR送信 UI ----
 $grpQR = New-Object System.Windows.Forms.GroupBox
-$grpQR.Text = 'カルテ機→スマホ (QR送信)'; $grpQR.Location = '12,388'; $grpQR.Size = New-Object System.Drawing.Size(522, 220)
-$form.Controls.Add($grpQR)
+$grpQR.Text = 'カルテ機→スマホ (QR送信)'; $grpQR.Location = '12,12'; $grpQR.Size = New-Object System.Drawing.Size(522, 220)
+$tabSend.Controls.Add($grpQR)
 
 $txtQRText = New-Object System.Windows.Forms.TextBox
 $txtQRText.Multiline = $true; $txtQRText.ScrollBars = 'Vertical'; $txtQRText.Location = '12,22'; $txtQRText.Size = New-Object System.Drawing.Size(498, 118)
@@ -1945,24 +1959,24 @@ $btnShowQR.Add_Click({
 # ---- Web App 案内QR (スマホでこのQRを読むと受信Web Appが開く) ----
 $lblAppQR = New-Object System.Windows.Forms.Label
 $lblAppQR.Text = "スマホでこのQRを読むと" + [char]10 + "受信Web Appが開きます"
-$lblAppQR.Location = '572,10'; $lblAppQR.Size = New-Object System.Drawing.Size(216, 34); $lblAppQR.TextAlign = 'MiddleCenter'
-$form.Controls.Add($lblAppQR)
+$lblAppQR.Location = '572,12'; $lblAppQR.Size = New-Object System.Drawing.Size(216, 34); $lblAppQR.TextAlign = 'MiddleCenter'
+$tabSend.Controls.Add($lblAppQR)
 $appQrB64 = 'iVBORw0KGgoAAAANSUhEUgAAANIAAADSCAIAAACw+wkVAAAEKElEQVR4nO3dQW7kNhRAQSvI/a+sLLLsjSCQfBRRtXa77fEDG39ISdd933+w1j+L3w9kR8NqR0B2BGRHQHYEZEdAdgRkR0B2BGRHQHYEZEdAdgRkR0B2BGRH4N93L7uu668z6kT0k9/i973mveqJed955d/CakdAdgRkR0B2BGTHdybZX/Out30yqb2bLufNib+vGjUR7/+3eMJqR0B2BGRHQHYEZMeXJ9lRU8+o2e333d9Nl6O+5p3rwXu9+z7tRGy1IyA7ArIjIDsCsuOsSXZ/8+bEUTPgfeidpa12BGRHQHYEZEdAdgQOmWTnndQdpb2adTdWOwKyIyA7ArIjIDvOmmRXTo7zThe/M+quUNeg3d7d9natdgRkR0B2BGRHQHZ8eZJt9xznTakrr6W9p91vajdWOwKyIyA7ArIjIDsC1267dfOs3JOd5z7i72W1IyA7ArIjIDsCsuPLz5Nt9y6f/ISjjHr3e+FMOurfcNTPbLUjIDsCsiMgOwKy4/Q92XmT0bt3H2XU9L3yubTtbGu1IyA7ArIjIDsCsuP058nOu1b0yTzVniVe+aSeK73b1RNWOwKyIyA7ArIjIDu+syc7b0fvi9/5id3uN/WE08UcxYcsAdkRkB0B2XH6nuyTr3k3l+02j49ybTahO13Mh/mQJSA7ArIjIDtOfwrPyms8R52VbXczr/ReyvP+Va12BGRHQHYEZEdAdnx5kp13P+FRe7srv/PKE7+/Rs2b8+Zoqx0B2RGQHQHZEZAd35lk5+2uvnvVvPtE7T8n3gvv3eQpPHyYD1kCsiMgOwKy48vPk/21/5Nh503fK6fCa+Fv4TpZPsyHLAHZEZAdAdnx5T3Zd68atXO6crJeuZN7pT+h62Q5ig9ZArIjIDsCsuOsp/Dsf9545T1+n7gX7lDP+/+BJ6x2BGRHQHYEZEdAdnxnkl058bUz1ygrZ9s7fQLvE1Y7ArIjIDsCsiMgO07fk135PJ2V94Da7ezuE+1cb7UjIDsCsiMgOwKy46zrZFd+zbyTzLvdpere7Nk9ThfzGT5kCciOgOwIyI6z7l08z+/0NG8H9t0+8sodz2vh6eJRrHYEZEdAdgRkR0B2fGeSbc/lPrFymht1jvre7ET0vPey2hGQHQHZEZAdAdnx5Um2Pa067/5FK++D9MTKexfP+72sdgRkR0B2BGRHQHacNcmuNG/eHPUc2HnuQdftuk6Ww/mQJSA7ArIjIDsCh0yyu82bTybrK33mbHsnK6sdAdkRkB0B2RGQHWdNsrtdvzlvbm3vf3VNO+3sebIcxYcsAdkRkB0B2fHlSXa3aW7/E8ijzLuyeNSrflntCMiOgOwIyI6A7AhcK3dO4X9WOwKyIyA7ArIjIDsCsiMgOwKyIyA7ArIjIDsCsiMgOwKyIyA7ArIjIDv+1vsP93Iy6cvgIn0AAAAASUVORK5CYII='
 $appQrMs = New-Object System.IO.MemoryStream(,[Convert]::FromBase64String($appQrB64))
 $picAppQR = New-Object System.Windows.Forms.PictureBox
 $picAppQR.Image = [System.Drawing.Image]::FromStream($appQrMs)
-$picAppQR.SizeMode = 'AutoSize'; $picAppQR.Location = '575,46'
-$form.Controls.Add($picAppQR)
+$picAppQR.SizeMode = 'AutoSize'; $picAppQR.Location = '575,48'
+$tabSend.Controls.Add($picAppQR)
 $lnkApp = New-Object System.Windows.Forms.LinkLabel
 $lnkApp.Text = 'https://yuya847.github.io/cdc-qr-reader/'
-$lnkApp.Location = '560,262'; $lnkApp.Size = New-Object System.Drawing.Size(238, 34); $lnkApp.TextAlign = 'MiddleCenter'
+$lnkApp.Location = '560,264'; $lnkApp.Size = New-Object System.Drawing.Size(238, 34); $lnkApp.TextAlign = 'MiddleCenter'
 $lnkApp.Add_LinkClicked({ Start-Process 'https://yuya847.github.io/cdc-qr-reader/' })
-$form.Controls.Add($lnkApp)
+$tabSend.Controls.Add($lnkApp)
 
 # ---- セットアップ / 接続ガイド (WiFi接続QR + 192.168.4.1 QR) ----
 $grpSetup = New-Object System.Windows.Forms.GroupBox
-$grpSetup.Text = 'セットアップ / 接続'; $grpSetup.Location = '546,306'; $grpSetup.Size = New-Object System.Drawing.Size(490, 345)
-$form.Controls.Add($grpSetup)
+$grpSetup.Text = 'セットアップ / 接続'; $grpSetup.Location = '546,12'; $grpSetup.Size = New-Object System.Drawing.Size(490, 345)
+$tabRecv.Controls.Add($grpSetup)
 
 $lblSetupInfo = New-Object System.Windows.Forms.Label
 $lblSetupInfo.Text = '①XIAO ESP32-S3をUSBに挿す' + [char]10 + '②スマホをWiFi接続（QR①をカメラで読むと自動接続）' + [char]10 + '③ブラウザで 192.168.4.1 を開く（QR②）'
