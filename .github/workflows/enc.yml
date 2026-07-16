@@ -5,6 +5,9 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Add-Type encoder test (Windows PowerShell 5.1)
+      - name: Add-Type encoder test
         shell: powershell
         run: .\test-encoder.ps1
+      - name: Parse receiver-gui.ps1 (Windows PowerShell 5.1)
+        shell: powershell
+        run: .\parse-gui.ps1
